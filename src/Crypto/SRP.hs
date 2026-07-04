@@ -171,7 +171,7 @@ calcResults selectX fc fs =
   let FromServer {fsPublicBytes, fsSalt, fsPrimeGroup = pg, fsKnownAlgorithm = alg} = fs
       FromClient {fcUser, fcPublicBytes = publicBytes} = fc
       bigS = calcPremasterSecret selectX fc fs
-      xorNG = bytesOf $ fromIntegral $ calcXorHashnHashg alg pg
+      xorNG = calcXorHashnHashg alg pg
       hashedName = hashText alg fcUser
       mkResult s =
         let rKey = hash alg $ bytesOf (fromIntegral s)

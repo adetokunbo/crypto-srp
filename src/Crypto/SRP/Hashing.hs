@@ -37,13 +37,13 @@ import qualified Crypto.Hash.SHA512 as SHA512
 import Crypto.SRP.PrimeGroup
   ( PrimeGroup
   , bytesOf
-  , fromBytes
   , generatorFor
   , padAs
   , safePrimeFor
   )
-import Data.Bits (Bits (xor))
+import Data.Bits (xor)
 import Data.ByteString (ByteString)
+import qualified Data.ByteString as BS
 import Data.Text (Text)
 import Data.Text.Encoding (encodeUtf8)
 import Data.Text.Normalize (NormalizationMode (NFKC), normalize)
@@ -65,11 +65,11 @@ calcK known pg =
 
 
 -- | Compute an XORed hash describing a @'PrimeGroup'@.
-calcXorHashnHashg :: KnownAlgorithm -> PrimeGroup -> Integer
+calcXorHashnHashg :: KnownAlgorithm -> PrimeGroup -> ByteString
 calcXorHashnHashg known pg =
-  let hashedN = fromBytes $ hash known (bytesOf (fromIntegral (safePrimeFor pg)))
-      hashedG = fromBytes $ hash known (bytesOf (fromIntegral (generatorFor pg)) `padAs` pg)
-   in hashedN `xor` hashedG
+  let hashedN = hash known (bytesOf (fromIntegral (safePrimeFor pg)))
+      hashedG = hash known (bytesOf (fromIntegral (generatorFor pg)) `padAs` pg)
+   in BS.pack $ BS.zipWith xor hashedN hashedG
 
 
 {- | Compute the hash \'x\' as a step in the calculation of the premaster secret
