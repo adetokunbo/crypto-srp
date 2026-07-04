@@ -170,8 +170,8 @@ verifyServerProof selectX serverProof fc fs =
 -}
 calcResults :: (XCalculator a) => a -> FromClient -> FromServer -> Maybe Results
 calcResults selectX fc fs =
-  let FromServer{fsPublicBytes, fsSalt, fsPrimeGroup = pg, fsKnownAlgorithm = alg} = fs
-      FromClient{fcUser, fcPublicBytes = publicBytes} = fc
+  let FromServer {fsPublicBytes, fsSalt, fsPrimeGroup = pg, fsKnownAlgorithm = alg} = fs
+      FromClient {fcUser, fcPublicBytes = publicBytes} = fc
       bigS = calcPremasterSecret selectX fc fs
       xorNG = bytesOf $ fromIntegral $ calcXorHashnHashg alg pg
       hashedName = hashText alg fcUser
@@ -180,7 +180,7 @@ calcResults selectX fc fs =
 
             rClientProof = hashMany alg [xorNG, hashedName, fsSalt, publicBytes, fsPublicBytes, rKey]
             rServerProof = hashMany alg [publicBytes, rClientProof, rKey]
-         in Results{rKey, rClientProof, rServerProof}
+         in Results {rKey, rClientProof, rServerProof}
    in mkResult <$> bigS
 
 
@@ -233,8 +233,8 @@ Nothing
 calcPremasterSecret :: (XCalculator a) => a -> FromClient -> FromServer -> Maybe Integer
 calcPremasterSecret selectX fc fs =
   let
-    FromServer{fsPublicBytes, fsPrimeGroup = pg, fsKnownAlgorithm = alg} = fs
-    FromClient{fcPrivateNumber = private, fcPublicBytes = publicBytes} = fc
+    FromServer {fsPublicBytes, fsPrimeGroup = pg, fsKnownAlgorithm = alg} = fs
+    FromClient {fcPrivateNumber = private, fcPublicBytes = publicBytes} = fc
     x = fromBytes $ calcX selectX fc fs
     u = fromBytes $ hashMany alg [publicBytes `padAs` pg, fsPublicBytes `padAs` pg]
     power = private + (u * x)
@@ -256,6 +256,6 @@ fromBytes = BS.foldl' (\acc b -> acc * 256 + fromIntegral b) 0
 bytesOf :: Natural -> BS.ByteString
 bytesOf 0 = BS.pack [0]
 bytesOf n = BS.pack $ reverse (bytes n)
- where
-  bytes 0 = []
-  bytes x = fromIntegral (x .&. 0xFF) : bytes (shiftR x 8)
+  where
+    bytes 0 = []
+    bytes x = fromIntegral (x .&. 0xFF) : bytes (shiftR x 8)

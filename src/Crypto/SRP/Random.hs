@@ -10,10 +10,11 @@ Provides cryptographically secure random byte generation used to produce the
 private ephemeral key in the SRP handshake. Uses hardware entropy when
 available, falling back to the OS entropy source via @System.Entropy@.
 -}
-module Crypto.SRP.Random (
-  genNSecureBytes,
-  gen256BitInteger,
-) where
+module Crypto.SRP.Random
+  ( genNSecureBytes
+  , gen256BitInteger
+  )
+where
 
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
