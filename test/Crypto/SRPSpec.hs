@@ -6,7 +6,6 @@ module Crypto.SRPSpec
 where
 
 import Crypto.SRP (bytesOf, fromBytes)
-import Numeric.Natural (Natural)
 import Crypto.SRP.Constants
   ( fromHexBS
   , n1024Bits
@@ -17,11 +16,19 @@ import Crypto.SRP.Constants
   , n6144Bits
   , n8192Bits
   )
+import Crypto.SRP.PrimeGroup
+  ( PrimeGroup (..)
+  , byteLength
+  , hexLength
+  , padAs
+  , paddedHexOfGenerator
+  )
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import Data.Char (ord)
 import Data.Word (Word8)
 import Fmt (build, fmt, hexF, (+|), (|+))
+import Numeric.Natural (Natural)
 import Test.Hspec (Spec, context, describe, it)
 import Test.QuickCheck
   ( Property
@@ -34,6 +41,7 @@ spec :: Spec
 spec = describe "module Crypto.SRP.Constants" $ do
   largeNumberSpec
   viaBytesSpec
+  primeGroupSpec
 
 
 viaBytes :: Natural -> Integer
@@ -95,3 +103,13 @@ isAllHex b =
 
 bsShow :: Integer -> ByteString
 bsShow = fmt . build . hexF
+
+
+primeGroupSpec :: Spec
+primeGroupSpec = describe "module Crypto.SRP.PrimeGroup" $ do
+  it "byteLength is hexLength `div` 2" $
+    byteLength G2048 == hexLength G2048 `div` 2
+  it "padAs pads a short ByteString to the binary byte length of N" $
+    BS.length (BS.empty `padAs` G2048) == byteLength G2048
+  it "paddedHexOfGenerator output has hexLength bytes" $
+    BS.length (paddedHexOfGenerator G2048) == hexLength G2048

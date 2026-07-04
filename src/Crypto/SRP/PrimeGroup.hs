@@ -19,6 +19,7 @@ module Crypto.SRP.PrimeGroup
   , safePrimeFor
   , asByteString
   , hexLength
+  , byteLength
   , paddedHexOfGenerator
   , pubOf
   , padAs
@@ -77,6 +78,7 @@ safePrimeFor G4096 = p4096
 safePrimeFor G6144 = p6144
 safePrimeFor G8192 = p8192
 
+
 p1024, p1536, p2048, p3072, p4096, p6144, p8192 :: Integer
 p1024 = fromHexBS n1024Bits
 p1536 = fromHexBS n1536Bits
@@ -98,18 +100,22 @@ asByteString G6144 = n6144Bits
 asByteString G8192 = n8192Bits
 
 
--- | The length of the result of 'asByteString'
+-- | The number of hex characters in the representation of the safe prime
 hexLength :: PrimeGroup -> Int
 hexLength = BS.length . asByteString
 
 
-{- | A ByteString of the generator padded so that has the same length as the
-result of 'asByteString'
--}
+-- | The number of bytes in the binary encoding of the safe prime
+byteLength :: PrimeGroup -> Int
+byteLength = (`div` 2) . hexLength
+
+
+-- | A ByteString of the generator padded to the same hex length as 'asByteString'
 paddedHexOfGenerator :: PrimeGroup -> ByteString
 paddedHexOfGenerator pg =
   let unpadded = fmt $ build $ hexF $ generatorFor pg
-   in unpadded `padAs` pg
+      padLength = hexLength pg - BS.length unpadded
+   in BS.replicate padLength 0 <> unpadded
 
 
 -- | Reduce an @Integer@ modulo the safe prime of a 'PrimeGroup'
@@ -119,16 +125,13 @@ primeMod num pg =
    in num `mod` prime
 
 
-
-{- | Pad a 'ByteString' so it's the same length as the serialized byte form of
-the PrimeGroup
+{- | Pad a 'ByteString' to the binary byte length of the safe prime of a
+'PrimeGroup', prepending zero bytes as needed
 -}
 padAs :: ByteString -> PrimeGroup -> ByteString
 padAs bs pg =
-  let
-    padLength = hexLength pg - BS.length bs
-   in
-    BS.replicate padLength 0 <> bs
+  let padLength = byteLength pg - BS.length bs
+   in BS.replicate padLength 0 <> bs
 
 
 {- | Generate the public version of a private ephemeral key
@@ -153,6 +156,6 @@ modExpPrime base power pg = modExp base power (safePrimeFor pg)
 modExp :: Integer -> Integer -> Integer -> Integer
 modExp _base 0 _m = 1
 modExp base expn m = t * modExp baseSquared (shiftR expn 1) m `mod` m
- where
-  !baseSquared = (base * base) `mod` m
-  !t = if testBit expn 0 then base `mod` m else 1
+  where
+    !baseSquared = (base * base) `mod` m
+    !t = if testBit expn 0 then base `mod` m else 1
