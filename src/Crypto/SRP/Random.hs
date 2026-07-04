@@ -16,8 +16,8 @@ module Crypto.SRP.Random
   )
 where
 
+import Crypto.SRP.PrimeGroup (fromBytes)
 import Data.ByteString (ByteString)
-import qualified Data.ByteString as BS
 import System.Entropy (getEntropy, getHardwareEntropy)
 
 
@@ -29,7 +29,3 @@ genNSecureBytes n = maybe (getEntropy n) pure =<< getHardwareEntropy n
 -- | Generate a cryptographically secure random 256-bit @Integer@
 gen256BitInteger :: IO Integer
 gen256BitInteger = fromBytes <$> genNSecureBytes 32
-
-
-fromBytes :: ByteString -> Integer
-fromBytes = BS.foldl' (\acc b -> acc * 256 + fromIntegral b) 0

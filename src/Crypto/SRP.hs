@@ -66,17 +66,16 @@ import Crypto.SRP.Hashing
   )
 import Crypto.SRP.PrimeGroup
   ( PrimeGroup (..)
+  , bytesOf
+  , fromBytes
   , modExpPrime
   , padAs
   , primeMod
   , pubOf
   )
 import Crypto.SRP.Random (genNSecureBytes)
-import Data.Bits (Bits (..))
 import Data.ByteString (ByteString)
-import qualified Data.ByteString as BS
 import Data.Text (Text)
-import Numeric.Natural (Natural)
 
 
 -- | Identifies a user
@@ -245,17 +244,3 @@ calcPremasterSecret selectX fc fs =
     base = ((bigB `primeMod` pg) - ((k * x') `primeMod` pg)) `primeMod` pg
    in
     if shouldAbort then Nothing else Just $ modExpPrime base power pg
-
-
--- | Obtain an @Integer@ from its @ByteString@ encoding
-fromBytes :: ByteString -> Integer
-fromBytes = BS.foldl' (\acc b -> acc * 256 + fromIntegral b) 0
-
-
--- | Encode a @Natural@ number as a @ByteString@
-bytesOf :: Natural -> BS.ByteString
-bytesOf 0 = BS.pack [0]
-bytesOf n = BS.pack $ reverse (bytes n)
-  where
-    bytes 0 = []
-    bytes x = fromIntegral (x .&. 0xFF) : bytes (shiftR x 8)

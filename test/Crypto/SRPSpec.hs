@@ -21,7 +21,6 @@ import Crypto.SRP.PrimeGroup
   , byteLength
   , hexLength
   , padAs
-  , paddedHexOfGenerator
   )
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
@@ -111,5 +110,3 @@ primeGroupSpec = describe "module Crypto.SRP.PrimeGroup" $ do
     byteLength G2048 == hexLength G2048 `div` 2
   it "padAs pads a short ByteString to the binary byte length of N" $
     BS.length (BS.empty `padAs` G2048) == byteLength G2048
-  it "paddedHexOfGenerator output has hexLength bytes" $
-    BS.length (paddedHexOfGenerator G2048) == hexLength G2048

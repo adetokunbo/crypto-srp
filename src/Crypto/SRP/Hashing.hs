@@ -36,20 +36,18 @@ import qualified Crypto.Hash.SHA384 as SHA384
 import qualified Crypto.Hash.SHA512 as SHA512
 import Crypto.SRP.PrimeGroup
   ( PrimeGroup
-  , asByteString
-  , paddedHexOfGenerator
+  , bytesOf
+  , fromBytes
+  , generatorFor
+  , padAs
+  , safePrimeFor
   )
 import Data.Bits (Bits (xor))
 import Data.ByteString (ByteString)
-import qualified Data.ByteString as BS
 import Data.Text (Text)
 import Data.Text.Encoding (encodeUtf8)
 import Data.Text.Normalize (NormalizationMode (NFKC), normalize)
 import Data.Word (Word32)
-
-
-fromBytes :: ByteString -> Integer
-fromBytes = BS.foldl' (\acc b -> acc * 256 + fromIntegral b) 0
 
 
 {- | Compute the multiplier \'k\' as a step in the calculation of the premaster
@@ -61,16 +59,16 @@ calcK :: KnownAlgorithm -> PrimeGroup -> ByteString
 calcK known pg =
   hashMany
     known
-    [ asByteString pg
-    , paddedHexOfGenerator pg
+    [ bytesOf (fromIntegral (safePrimeFor pg)) `padAs` pg
+    , bytesOf (fromIntegral (generatorFor pg)) `padAs` pg
     ]
 
 
 -- | Compute an XORed hash describing a @'PrimeGroup'@.
 calcXorHashnHashg :: KnownAlgorithm -> PrimeGroup -> Integer
 calcXorHashnHashg known pg =
-  let hashedN = fromBytes $ hash known (asByteString pg)
-      hashedG = fromBytes $ hash known (paddedHexOfGenerator pg)
+  let hashedN = fromBytes $ hash known (bytesOf (fromIntegral (safePrimeFor pg)))
+      hashedG = fromBytes $ hash known (bytesOf (fromIntegral (generatorFor pg)) `padAs` pg)
    in hashedN `xor` hashedG
 
 

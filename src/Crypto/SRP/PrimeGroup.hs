@@ -20,11 +20,14 @@ module Crypto.SRP.PrimeGroup
   , asByteString
   , hexLength
   , byteLength
-  , paddedHexOfGenerator
   , pubOf
   , padAs
   , primeMod
   , modExpPrime
+
+    -- * SRP Integer \<=> ByteString interconversion
+  , bytesOf
+  , fromBytes
   )
 where
 
@@ -38,11 +41,11 @@ import Crypto.SRP.Constants
   , n6144Bits
   , n8192Bits
   )
-import Data.Bits (Bits (shiftR, testBit))
+import Data.Bits (Bits (shiftR, testBit, (.&.)))
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import Data.Word (Word8)
-import Fmt (build, fmt, hexF)
+import Numeric.Natural (Natural)
 
 
 -- | Represents the primeGroups used in SRP computations
@@ -110,12 +113,18 @@ byteLength :: PrimeGroup -> Int
 byteLength = (`div` 2) . hexLength
 
 
--- | A ByteString of the generator padded to the same hex length as 'asByteString'
-paddedHexOfGenerator :: PrimeGroup -> ByteString
-paddedHexOfGenerator pg =
-  let unpadded = fmt $ build $ hexF $ generatorFor pg
-      padLength = hexLength pg - BS.length unpadded
-   in BS.replicate padLength 0 <> unpadded
+-- | Encode a @Natural@ number as a @ByteString@
+bytesOf :: Natural -> ByteString
+bytesOf 0 = BS.pack [0]
+bytesOf n = BS.pack $ reverse (bytes n)
+  where
+    bytes 0 = []
+    bytes x = fromIntegral (x .&. 0xFF) : bytes (shiftR x 8)
+
+
+-- | Obtain an @Integer@ from its @ByteString@ encoding
+fromBytes :: ByteString -> Integer
+fromBytes = BS.foldl' (\acc b -> acc * 256 + fromIntegral b) 0
 
 
 -- | Reduce an @Integer@ modulo the safe prime of a 'PrimeGroup'
