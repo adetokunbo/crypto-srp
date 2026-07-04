@@ -1,3 +1,4 @@
+{-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Crypto.SRPSpec
@@ -7,8 +8,7 @@ where
 
 import Crypto.SRP (bytesOf, fromBytes)
 import Crypto.SRP.Constants
-  ( fromHexBS
-  , n1024Bits
+  ( n1024Bits
   , n1536Bits
   , n2048Bits
   , n3072Bits
@@ -81,6 +81,22 @@ oneNumberSpec b bitSize = do
     it "should roundtrip with its integer value" $ fromHexBS b == fromHexBS (bsShow (fromHexBS b))
     context "hexLength" $ do
       it "should be consistent with the number of bits" $ BS.length b == bitSize `div` 4
+
+
+fromHexBS :: ByteString -> Integer
+fromHexBS = BS.foldl' (\acc d -> acc * 16 + hexCharToInt d) 0
+
+
+hexCharToInt :: Word8 -> Integer
+hexCharToInt w =
+  let to0 = w - ordAlt '0'
+      toa = w - ordAlt 'a'
+      toA = w - ordAlt 'A'
+   in if
+        | to0 < 10 -> fromIntegral to0
+        | toa < 6 -> fromIntegral toa + 10
+        | toA < 6 -> fromIntegral toA + 10
+        | otherwise -> error $ "fromHexBS: invalid hex byte " ++ show w
 
 
 isHexChar :: Word8 -> Bool

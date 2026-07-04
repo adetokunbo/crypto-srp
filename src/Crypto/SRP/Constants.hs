@@ -1,4 +1,3 @@
-{-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_HADDOCK prune #-}
 
@@ -10,8 +9,7 @@ SPDX-License-Identifier: BSD3
 
 Provides the standard large safe primes and generators from
 [RFC 5054 Appendix A](https://datatracker.ietf.org/doc/html/rfc5054#appendix-A),
-encoded as hex @'ByteString'@s, along with 'fromHexBS' for converting them to
-@Integer@ values.
+encoded as hex @'ByteString'@s.
 -}
 module Crypto.SRP.Constants
   ( -- * Hex ByteStrings of SRP primes
@@ -22,16 +20,10 @@ module Crypto.SRP.Constants
   , n4096Bits
   , n6144Bits
   , n8192Bits
-
-    -- * Convert a hex Bytestring to the corresponding Integer
-  , fromHexBS
   )
 where
 
 import Data.ByteString (ByteString)
-import qualified Data.ByteString as BS
-import Data.Char (ord)
-import Data.Word (Word8)
 
 
 -- | A large safe prime (from RFC 5054, 1024-bit group)
@@ -183,27 +175,3 @@ n8192Bits =
     <> "359046F4EB879F924009438B481C6CD7889A002ED5EE382BC9190DA6"
     <> "FC026E479558E4475677E9AA9E3050E2765694DFC81F56E880B96E71"
     <> "60C980DD98EDD3DFFFFFFFFFFFFFFFFF"
-
-
-ordAlt :: Char -> Word8
-ordAlt = fromIntegral . ord
-
-
-hexCharToInt :: Word8 -> Integer
-hexCharToInt w =
-  let to0 = w - ordAlt '0'
-      toa = w - ordAlt 'a'
-      toA = w - ordAlt 'A'
-   in if
-        | to0 < 10 -> fromIntegral to0
-        | toa < 6 -> fromIntegral toa + 10
-        | otherwise -> fromIntegral toA + 10
-
-
-addHex :: Integer -> Word8 -> Integer
-addHex acc d = (acc * 16) + hexCharToInt d
-
-
--- | Convert a hex-encoded @'ByteString'@ to its corresponding @Integer@ value
-fromHexBS :: ByteString -> Integer
-fromHexBS = BS.foldl' addHex 0
