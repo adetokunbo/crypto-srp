@@ -6,6 +6,7 @@ module Crypto.SRPSpec
 where
 
 import Crypto.SRP (bytesOf, fromBytes)
+import Numeric.Natural (Natural)
 import Crypto.SRP.Constants
   ( fromHexBS
   , n1024Bits
@@ -35,7 +36,7 @@ spec = describe "module Crypto.SRP.Constants" $ do
   viaBytesSpec
 
 
-viaBytes :: Integer -> Integer
+viaBytes :: Natural -> Integer
 viaBytes = fromBytes . bytesOf
 
 
@@ -45,7 +46,7 @@ max64Bit = (2 ^ (63 :: Int)) - 1
 
 prop_roundtripViaBytes :: Property
 prop_roundtripViaBytes = forAll (chooseInteger (0, max64Bit)) $ \anInteger ->
-  viaBytes anInteger == anInteger
+  viaBytes (fromIntegral anInteger) == anInteger
 
 
 viaBytesSpec :: Spec

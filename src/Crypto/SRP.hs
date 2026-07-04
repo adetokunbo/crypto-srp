@@ -76,6 +76,7 @@ import Data.Bits (Bits (..))
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import Data.Text (Text)
+import Numeric.Natural (Natural)
 
 
 -- | Identifies a user
@@ -130,7 +131,7 @@ mkFromClient fcUser fcPassword pg = do
     FromClient
       { fcUser
       , fcPassword
-      , fcPublicBytes = bytesOf public
+      , fcPublicBytes = bytesOf (fromIntegral public)
       , fcPrivateNumber = fromBytes privateBytes
       }
 
@@ -172,10 +173,10 @@ calcResults selectX fc fs =
   let FromServer{fsPublicBytes, fsSalt, fsPrimeGroup = pg, fsKnownAlgorithm = alg} = fs
       FromClient{fcUser, fcPublicBytes = publicBytes} = fc
       bigS = calcPremasterSecret selectX fc fs
-      xorNG = bytesOf $ calcXorHashnHashg alg pg
+      xorNG = bytesOf $ fromIntegral $ calcXorHashnHashg alg pg
       hashedName = hashText alg fcUser
       mkResult s =
-        let rKey = hash alg $ bytesOf s
+        let rKey = hash alg $ bytesOf (fromIntegral s)
 
             rClientProof = hashMany alg [xorNG, hashedName, fsSalt, publicBytes, fsPublicBytes, rKey]
             rServerProof = hashMany alg [publicBytes, rClientProof, rKey]
@@ -251,11 +252,10 @@ fromBytes :: ByteString -> Integer
 fromBytes = BS.foldl' (\acc b -> acc * 256 + fromIntegral b) 0
 
 
--- | Encode an @Integer@ as a @ByteString@
-bytesOf :: Integer -> BS.ByteString
-bytesOf n
-  | n == 0 = BS.pack [0]
-  | otherwise = BS.pack $ reverse (bytes (abs n))
+-- | Encode a @Natural@ number as a @ByteString@
+bytesOf :: Natural -> BS.ByteString
+bytesOf 0 = BS.pack [0]
+bytesOf n = BS.pack $ reverse (bytes n)
  where
   bytes 0 = []
   bytes x = fromIntegral (x .&. 0xFF) : bytes (shiftR x 8)
