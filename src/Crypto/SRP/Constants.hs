@@ -207,6 +207,3 @@ addHex acc d = (acc * 16) + hexCharToInt d
 -- | Convert a hex-encoded @'ByteString'@ to its corresponding @Integer@ value
 fromHexBS :: ByteString -> Integer
 fromHexBS = BS.foldl' addHex 0
-
--- why is the username included in the verifier calculation
--- https://crypto.stackexchange.com/questions/8626/why-is-tls-srp-verifier-based-on-user-name
