@@ -1,11 +1,16 @@
 {-# LANGUAGE BangPatterns #-}
-{-# OPTIONS_HADDOCK prune not-home #-}
+{-# OPTIONS_HADDOCK prune #-}
 
 {- |
 Module      : Crypto.SRP.PrimeGroup
-Copyright : (c) 2025 Tim Emiola
-Maintainer: Tim Emiola <adetokunbo@emio.la>
+Copyright   : (c) 2025 Tim Emiola
+Maintainer  : Tim Emiola <adetokunbo@emio.la>
 SPDX-License-Identifier: BSD3
+
+Provides the 'PrimeGroup' type representing the standard SRP prime groups
+(1024–8192 bits) and the group-arithmetic operations used during the SRP
+handshake: public key generation ('pubOf'), modular exponentiation
+('modExpPrime'), and @'ByteString'@ encoding helpers.
 -}
 module Crypto.SRP.PrimeGroup
   ( -- * the PrimeGroups
@@ -93,12 +98,14 @@ paddedHexOfGenerator pg =
    in unpadded `padAs` pg
 
 
+-- | Reduce an @Integer@ modulo the safe prime of a 'PrimeGroup'
 primeMod :: Integer -> PrimeGroup -> Integer
 primeMod num pg =
   let prime = safePrimeFor pg
    in num `mod` prime
 
 
+-- | Raise the generator of a 'PrimeGroup' to the given exponent
 pow :: PrimeGroup -> Integer -> Integer
 pow pg expn =
   let g = generatorFor pg

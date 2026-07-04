@@ -1,1 +1,4 @@
 packages: .
+
+package crypto-srp
+  ghc-options: -haddock

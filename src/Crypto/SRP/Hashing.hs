@@ -1,12 +1,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE StrictData #-}
-{-# OPTIONS_HADDOCK prune not-home #-}
+{-# OPTIONS_HADDOCK prune #-}
 
 {- |
-Module      : Crypto.SRP.Hash
-Copyright : (c) 2025 Tim Emiola
-Maintainer: Tim Emiola <adetokunbo@emio.la>
+Module      : Crypto.SRP.Hashing
+Copyright   : (c) 2025 Tim Emiola
+Maintainer  : Tim Emiola <adetokunbo@emio.la>
 SPDX-License-Identifier: BSD3
+
+Provides the 'KnownAlgorithm' abstraction over SHA1, SHA256, SHA384 and SHA512,
+together with the SRP-specific hash combinators ('calcK', 'calcClientX',
+'calcXorHashnHashg') that implement the intermediate steps from
+[RFC 5054 §2.6](https://datatracker.ietf.org/doc/html/rfc5054#section-2.6).
 -}
 module Crypto.SRP.Hashing
   ( -- * Supported hash algorithms
@@ -80,6 +85,7 @@ calcClientX (username, password) serverSalt known =
    in h [serverSalt, h [normalize' username, ":", normalize' password]]
 
 
+-- | Hash a 'Text' value after normalising it to NFKC form
 hashText :: KnownAlgorithm -> Text -> ByteString
 hashText known txt =
   let

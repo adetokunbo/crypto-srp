@@ -1,5 +1,5 @@
 {-# LANGUAGE NamedFieldPuns #-}
-{-# OPTIONS_HADDOCK prune not-home #-}
+{-# OPTIONS_HADDOCK prune #-}
 
 {- |
 Module      : Crypto.SRP
@@ -7,7 +7,16 @@ Copyright   : (c) 2025 Tim Emiola
 Maintainer  : Tim Emiola <adetokunbo@emio.la>
 SPDX-License-Identifier: BSD3
 
-Provides datatypes and functions and typeclasses to support an SRP authentication sequence
+Core types and functions for the client side of an SRP authentication sequence.
+
+The typical flow:
+
+1. Call 'mkFromClient' with the username, password and a 'PrimeGroup' to
+   produce a 'FromClient' value and generate a random private ephemeral key.
+2. Send 'fcPublicBytes' to the server; receive a 'FromServer' in reply.
+3. Call 'calcResults' (supplying an 'XCalculator') to derive the shared
+   session key and client\/server proofs.
+4. Optionally call 'verifyServerProof' to confirm the server holds the same key.
 -}
 module Crypto.SRP
   ( -- * client-side inputs
@@ -30,6 +39,10 @@ module Crypto.SRP
     -- * SRP Integer <=> ByteString interconversion
   , bytesOf
   , fromBytes
+
+    -- * type aliases
+  , Username
+  , Password
 
     -- * re-exports
   , PrimeGroup (..)

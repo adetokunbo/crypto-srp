@@ -1,12 +1,17 @@
 {-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# OPTIONS_HADDOCK prune not-home #-}
+{-# OPTIONS_HADDOCK prune #-}
 
 {- |
 Module      : Crypto.SRP.Constants
-Copyright : (c) 2025 Tim Emiola
-Maintainer: Tim Emiola <adetokunbo@emio.la>
+Copyright   : (c) 2025 Tim Emiola
+Maintainer  : Tim Emiola <adetokunbo@emio.la>
 SPDX-License-Identifier: BSD3
+
+Provides the standard large safe primes and generators from
+[RFC 5054 Appendix A](https://datatracker.ietf.org/doc/html/rfc5054#appendix-A),
+encoded as hex @'ByteString'@s, along with 'fromHexBS' for converting them to
+@Integer@ values.
 -}
 module Crypto.SRP.Constants
   ( -- * Hex ByteStrings of SRP primes
@@ -199,6 +204,7 @@ addHex :: Integer -> Word8 -> Integer
 addHex acc d = (acc * 16) + hexCharToInt d
 
 
+-- | Convert a hex-encoded @'ByteString'@ to its corresponding @Integer@ value
 fromHexBS :: ByteString -> Integer
 fromHexBS = BS.foldl' addHex 0
 
