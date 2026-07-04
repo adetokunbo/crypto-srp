@@ -2,9 +2,24 @@ cabal-version: 3.0
 name:          crypto-srp
 version:       0.1.0.0
 synopsis:      SRP authentication primitives
+description:
+  A library providing primitives for the
+  [Secure Remote Password (SRP)](https://datatracker.ietf.org/doc/html/rfc5054) protocol.
+
+  It includes the core SRP computation — public key exchange, premaster secret
+  derivation, client\/server proof generation and verification — along with the
+  standard prime groups from RFC 5054 Appendix A, a hash algorithm abstraction
+  covering SHA1, SHA256, SHA384 and SHA512, and cryptographically random
+  private key generation.
+
 license:       BSD-3-Clause
+license-file:  LICENSE
 author:        Tim Emiola
 maintainer:    adetokunbo@emio.la
+category:      Cryptography
+extra-doc-files:
+  README.md
+  ChangeLog.md
 
 library
   exposed-modules:  Crypto.SRP
