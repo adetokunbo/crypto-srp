@@ -1,4 +1,5 @@
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE MultiWayIf #-}
 {-# OPTIONS_HADDOCK prune #-}
 
 {- |
@@ -32,8 +33,7 @@ module Crypto.SRP.PrimeGroup
 where
 
 import Crypto.SRP.Constants
-  ( fromHexBS
-  , n1024Bits
+  ( n1024Bits
   , n1536Bits
   , n2048Bits
   , n3072Bits
@@ -44,6 +44,7 @@ import Crypto.SRP.Constants
 import Data.Bits (Bits (shiftR, testBit, (.&.)))
 import Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
+import Data.Char (ord)
 import Data.Word (Word8)
 import Numeric.Natural (Natural)
 
@@ -80,6 +81,23 @@ safePrimeFor G3072 = p3072
 safePrimeFor G4096 = p4096
 safePrimeFor G6144 = p6144
 safePrimeFor G8192 = p8192
+
+
+fromHexBS :: ByteString -> Integer
+fromHexBS = BS.foldl' (\acc d -> acc * 16 + hexCharToInt d) 0
+
+
+hexCharToInt :: Word8 -> Integer
+hexCharToInt w =
+  let wI = fromIntegral w :: Integer
+      to0 = wI - fromIntegral (ord '0')
+      toa = wI - fromIntegral (ord 'a')
+      toA = wI - fromIntegral (ord 'A')
+   in if
+        | to0 >= 0 && to0 < 10 -> to0
+        | toa >= 0 && toa < 6 -> toa + 10
+        | toA >= 0 && toA < 6 -> toA + 10
+        | otherwise -> error $ "fromHexBS: invalid hex byte " ++ show w
 
 
 p1024, p1536, p2048, p3072, p4096, p6144, p8192 :: Integer
