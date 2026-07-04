@@ -22,7 +22,6 @@ module Crypto.SRP.PrimeGroup
   , paddedHexOfGenerator
   , pubOf
   , padAs
-  , pow
   , primeMod
   , modExpPrime
   )
@@ -104,12 +103,6 @@ primeMod num pg =
   let prime = safePrimeFor pg
    in num `mod` prime
 
-
--- | Raise the generator of a 'PrimeGroup' to the given exponent
-pow :: PrimeGroup -> Integer -> Integer
-pow pg expn =
-  let g = generatorFor pg
-   in toInteger g ^ expn
 
 
 {- | Pad a 'ByteString' so it's the same length as the serialized byte form of
