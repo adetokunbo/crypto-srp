@@ -73,7 +73,7 @@ import Crypto.SRP.PrimeGroup
   , primeMod
   , pubOf
   )
-import Crypto.SRP.Random (genNSecureBytes)
+import Crypto.SRP.Random (gen256BitInteger)
 import Data.ByteString (ByteString)
 import Data.Text (Text)
 
@@ -123,15 +123,14 @@ required for the client-side of the authentication process
 -}
 mkFromClient :: Username -> Password -> PrimeGroup -> IO FromClient
 mkFromClient fcUser fcPassword pg = do
-  privateBytes <- genNSecureBytes 32
-  let private = fromBytes privateBytes
-      public = private `pubOf` pg
+  private <- gen256BitInteger
+  let public = private `pubOf` pg
   pure
     FromClient
       { fcUser
       , fcPassword
       , fcPublicBytes = bytesOf (fromIntegral public)
-      , fcPrivateNumber = fromBytes privateBytes
+      , fcPrivateNumber = private
       }
 
 
