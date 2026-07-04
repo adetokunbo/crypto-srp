@@ -1,0 +1,27 @@
+cabal-version: 3.0
+name:          crypto-srp
+version:       0.1.0.0
+synopsis:      SRP authentication primitives
+license:       BSD-3-Clause
+author:        Tim Emiola
+maintainer:    adetokunbo@emio.la
+
+library
+  exposed-modules:  Crypto.SRP
+  other-modules:    Crypto.SRP.Constants
+                    Crypto.SRP.Hashing
+                    Crypto.SRP.PrimeGroup
+                    Crypto.SRP.Random
+  hs-source-dirs:   src
+  build-depends:
+      base                 >= 4.12 && < 5
+    , bytestring           >=0.10.8 && <0.11 || >=0.11.3 && <0.13
+    , cryptohash-sha1      >= 0.11 && < 0.12
+    , cryptohash-sha256    >= 0.11 && < 0.12
+    , cryptohash-sha512    >= 0.11 && < 0.12
+    , entropy              >= 0.3.7 && < 0.5
+    , fmt                  >= 0.6.3 && < 0.8
+    , text                 >= 1.2.3 && < 2.2
+    , unicode-transforms   >= 0.3 && < 0.5
+  default-language: Haskell2010
+  ghc-options:      -Wall -Wincomplete-uni-patterns -Wpartial-fields -fwarn-tabs
