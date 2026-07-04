@@ -14,6 +14,9 @@ import os
 import sys
 import srp
 
+# Use RFC 5054 padding (PAD(g) for k, PAD(A)/PAD(B) for u) to match crypto-srp.
+srp.rfc5054_enable()
+
 user = os.environ["PYSRP_USER"]
 password = os.environ["PYSRP_PASS"]
 
