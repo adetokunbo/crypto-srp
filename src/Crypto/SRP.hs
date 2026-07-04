@@ -118,8 +118,12 @@ data FromClient = FromClient
   }
 
 
-{- | Build a @FromClient@, generating the public and private epheremal values
-required for the client-side of the authentication process
+{- | Build a @FromClient@, generating the public and private ephemeral values
+required for the client-side of the authentication process.
+
+The private ephemeral key is generated as a 256-bit random integer, which meets
+the minimum key size required by
+[RFC 5054 §2.6](https://datatracker.ietf.org/doc/html/rfc5054#section-2.6).
 -}
 mkFromClient :: Username -> Password -> PrimeGroup -> IO FromClient
 mkFromClient fcUser fcPassword pg = do
