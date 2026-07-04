@@ -163,8 +163,7 @@ padAs bs pg =
 
 {- | Generate the public version of a private ephemeral key
 
-the private version of the key is expected to be randomly generated value of
-64 bits
+the private version of the key is expected to be a randomly generated integer
 -}
 pubOf :: Integer -> PrimeGroup -> Integer
 pubOf priv pg = modExpPrime (fromIntegral (generatorFor pg)) priv pg
@@ -181,8 +180,10 @@ modExpPrime base power pg = modExp base power (safePrimeFor pg)
 
 
 modExp :: Integer -> Integer -> Integer -> Integer
-modExp _base 0 _m = 1
-modExp base expn m = t * modExp baseSquared (shiftR expn 1) m `mod` m
+modExp base expn m = go 1 (base `mod` m) expn
   where
-    !baseSquared = (base * base) `mod` m
-    !t = if testBit expn 0 then base `mod` m else 1
+    go !acc !b !e
+      | e == 0 = acc
+      | otherwise =
+          let acc' = if testBit e 0 then (acc * b) `mod` m else acc
+           in go acc' ((b * b) `mod` m) (shiftR e 1)
