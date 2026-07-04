@@ -242,7 +242,7 @@ calcPremasterSecret selectX fc fs =
     power = private + (u * x)
     x' = x `pubOf` pg
     bigB = fromBytes fsPublicBytes
-    shouldAbort = bigB <= 0 || bigB `primeMod` pg == 0
+    shouldAbort = bigB `primeMod` pg == 0
     k = fromBytes $ calcK alg pg
     base = ((bigB `primeMod` pg) - ((k * x') `primeMod` pg)) `primeMod` pg
    in

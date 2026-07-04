@@ -153,7 +153,10 @@ primeMod num pg =
 
 
 {- | Pad a 'ByteString' to the binary byte length of the safe prime of a
-'PrimeGroup', prepending zero bytes as needed
+'PrimeGroup', prepending zero bytes as needed.
+
+Precondition: @'BS.length' bs <= 'byteLength' pg@. If @bs@ is longer than the
+group's byte length, no truncation occurs — the input is returned unchanged.
 -}
 padAs :: ByteString -> PrimeGroup -> ByteString
 padAs bs pg =
