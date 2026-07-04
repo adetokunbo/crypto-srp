@@ -114,7 +114,7 @@ data FromClient = FromClient
   , fcPrivateNumber :: !Integer
   -- ^ a randomly generated session secret
   , fcPublicBytes :: !ByteString
-  -- ^ a securely hashed version of the session secret
+  -- ^ the client's public ephemeral key @g^a mod N@
   }
 
 
@@ -151,7 +151,7 @@ verifyServerProof selectX serverProof fc fs =
   K = H(S) -- @S@ is the premaster secret, @K@ is the shared session key
 
   @M@ (clientProof) is calculated independently on the server and client and is
-  sent from the cient to the server. If this does not match the server's value
+  sent from the client to the server. If this does not match the server's value
   the server aborts the authentication process.  The client calculates this as:
 
   M = H(H(N) XOR H(g) | H(U) | s | A | B | K)
@@ -164,7 +164,7 @@ verifyServerProof selectX serverProof fc fs =
 
   if the serverProof does not match what the client expects, it aborts
 
-  The 'XCalculator' argument models the choice existing in the calcuation of
+  The 'XCalculator' argument models the choice existing in the calculation of
   @x@, a hash depending on the user's password, on which @S@ in turn depends
 
   the calculation will abort if server public valid is invalid; in this case, the function
@@ -191,10 +191,10 @@ calcResults selectX fc fs =
   One step in calculating @S@, the shared secret is the calculation of @x@,
   which is a hash that depends on the user password.
 
-  @x@ must depend on the password, and the SRP RFC specifies a hash cacluation
+  @x@ must depend on the password, and the SRP RFC specifies a hash calculation
   that includes both the user identity and the password.
 
-  However, it is not strictly necessary of @x@ to depend on the user identity,
+  However, it is not strictly necessary for @x@ to depend on the user identity,
   and there are SRP server deployments that don't include the user name in @x@;
   instead only the password is used, using a KDF (key derivation function) to
   further protect it
