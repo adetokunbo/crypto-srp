@@ -8,7 +8,7 @@ maintainer:    adetokunbo@emio.la
 
 library
   exposed-modules:  Crypto.SRP
-  other-modules:    Crypto.SRP.Constants
+                    Crypto.SRP.Constants
                     Crypto.SRP.Hashing
                     Crypto.SRP.PrimeGroup
                     Crypto.SRP.Random
@@ -25,3 +25,18 @@ library
     , unicode-transforms   >= 0.3 && < 0.5
   default-language: Haskell2010
   ghc-options:      -Wall -Wincomplete-uni-patterns -Wpartial-fields -fwarn-tabs
+
+test-suite test
+  type:             exitcode-stdio-1.0
+  main-is:          Spec.hs
+  hs-source-dirs:   test
+  other-modules:    Crypto.SRPSpec
+  default-language: Haskell2010
+  ghc-options:      -threaded -rtsopts -with-rtsopts=-N -Wall -fwarn-tabs
+  build-depends:
+      base
+    , bytestring
+    , crypto-srp
+    , fmt
+    , hspec       >= 2.1 && < 3.0
+    , QuickCheck  >= 2.13 && < 2.16
