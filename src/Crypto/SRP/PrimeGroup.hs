@@ -169,7 +169,7 @@ pubOf :: Integer -> PrimeGroup -> Integer
 pubOf priv pg = modExpPrime (fromIntegral (generatorFor pg)) priv pg
 
 
-{- | Perform exponetiation modulus the large number in a 'PrimeGroup'
+{- | Perform exponentiation modulus the large number in a 'PrimeGroup'
 
 Example
 
