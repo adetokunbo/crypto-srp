@@ -69,7 +69,22 @@ generatorFor G8192 = 0x19
 
 -- | The safe prime for 'PrimeGroup'
 safePrimeFor :: PrimeGroup -> Integer
-safePrimeFor = fromHexBS . asByteString
+safePrimeFor G1024 = p1024
+safePrimeFor G1536 = p1536
+safePrimeFor G2048 = p2048
+safePrimeFor G3072 = p3072
+safePrimeFor G4096 = p4096
+safePrimeFor G6144 = p6144
+safePrimeFor G8192 = p8192
+
+p1024, p1536, p2048, p3072, p4096, p6144, p8192 :: Integer
+p1024 = fromHexBS n1024Bits
+p1536 = fromHexBS n1536Bits
+p2048 = fromHexBS n2048Bits
+p3072 = fromHexBS n3072Bits
+p4096 = fromHexBS n4096Bits
+p6144 = fromHexBS n6144Bits
+p8192 = fromHexBS n8192Bits
 
 
 -- | A ByteString representing the safe prime in hexadecimal
