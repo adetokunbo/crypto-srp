@@ -27,6 +27,7 @@ import Crypto.SRP.Constants
   , n6144Bits
   , n8192Bits
   )
+import Crypto.SRP.Hashing (calcClientX, calcK)
 import Crypto.SRP.PrimeGroup
   ( PrimeGroup (..)
   , byteLength
@@ -106,10 +107,10 @@ hashingSpec = describe "module Crypto.SRP.Hashing" $ do
     it "SHA384 is 48 bytes" $ digestSize SHA384 == 48
     it "SHA512 is 64 bytes" $ digestSize SHA512 == 64
   context "hash output length" $ do
-    it "SHA1   produces digestSize bytes" $ BS.length (hash SHA1 "x") == 20
-    it "SHA256 produces digestSize bytes" $ BS.length (hash SHA256 "x") == 32
-    it "SHA384 produces digestSize bytes" $ BS.length (hash SHA384 "x") == 48
-    it "SHA512 produces digestSize bytes" $ BS.length (hash SHA512 "x") == 64
+    it "SHA1   produces digestSize bytes" $ BS.length (hash SHA1 "x") == fromIntegral (digestSize SHA1)
+    it "SHA256 produces digestSize bytes" $ BS.length (hash SHA256 "x") == fromIntegral (digestSize SHA256)
+    it "SHA384 produces digestSize bytes" $ BS.length (hash SHA384 "x") == fromIntegral (digestSize SHA384)
+    it "SHA512 produces digestSize bytes" $ BS.length (hash SHA512 "x") == fromIntegral (digestSize SHA512)
 
 
 -- RFC 5054 Appendix B test vectors (G1024 / SHA1).
@@ -141,6 +142,8 @@ rfc5054Spec = describe "RFC 5054 Appendix B" $ do
       expectedK = hexBS "017eefa1cefc5c2e626e21598987f31e0f1b11bb"
       expectedM1 = hexBS "62c71b289cb22a034b405667e1541202ce5d8e03"
       expectedM2 = hexBS "b475d7f2d75ce9537748005483e5d326048b59e9"
+      expectedMultiplierK = hexBS "7556AA045AEF2CDD07ABAF0F665C3E818913186F"
+      expectedX = hexBS "94B7555AABE9127CC58CCF4993DB6CF84D16C124"
 
   it "calcResults produces the correct session key and proofs" $
     case calcResults () fc fs of
@@ -154,13 +157,19 @@ rfc5054Spec = describe "RFC 5054 Appendix B" $ do
     verifyServerProof () expectedM2 fc fs `shouldBe` True
 
   it "verifyServerProof returns False for a wrong M2" $
-    verifyServerProof () (BS.replicate 20 0) fc fs `shouldBe` False
+    verifyServerProof () (BS.replicate (fromIntegral (digestSize SHA1)) 0) fc fs `shouldBe` False
 
   it "calcResults returns Nothing when B is a multiple of N" $
     let fsInvalid = fs {fsPublicBytes = bytesOf (fromIntegral (safePrimeFor G1024))}
      in case calcResults () fc fsInvalid of
           Nothing -> pure ()
           Just _ -> expectationFailure "expected Nothing for B ≡ 0 (mod N)"
+
+  it "calcK produces the RFC 5054 Appendix B multiplier k" $
+    calcK SHA1 G1024 `shouldBe` expectedMultiplierK
+
+  it "calcClientX produces the RFC 5054 Appendix B x for alice/password123" $
+    calcClientX ("alice", "password123") salt SHA1 `shouldBe` expectedX
 
 
 fromHexBS :: ByteString -> Integer
@@ -216,3 +225,6 @@ primeGroupSpec = describe "module Crypto.SRP.PrimeGroup" $ do
     byteLength G2048 == hexLength G2048 `div` 2
   it "padAs pads a short ByteString to the binary byte length of N" $
     BS.length (BS.empty `padAs` G2048) == byteLength G2048
+  it "padAs returns an oversized ByteString unchanged" $
+    let oversized = BS.replicate (byteLength G2048 + 1) 0
+     in BS.length (oversized `padAs` G2048) == byteLength G2048 + 1
