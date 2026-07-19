@@ -1,6 +1,6 @@
 cabal-version: 3.0
 name:          crypto-srp
-version:       0.1.0.1
+version:       0.1.0.2
 synopsis:      SRP authentication primitives
 description:
   A library providing primitives for the
@@ -16,6 +16,8 @@ license:       BSD-3-Clause
 license-file:  LICENSE
 author:        Tim Emiola
 maintainer:    adetokunbo@emio.la
+homepage:      https://github.com/adetokunbo/crypto-srp#readme
+bug-reports:   https://github.com/adetokunbo/crypto-srp/issues
 category:      Cryptography
 tested-with:
   GHC == 8.10.7
@@ -31,6 +33,10 @@ extra-doc-files:
   ChangeLog.md
 data-files:
   test/pysrp_server.py
+
+source-repository head
+  type:     git
+  location: https://github.com/adetokunbo/crypto-srp.git
 
 flag pysrp
   description: Enable pysrp compatibility tests (requires Python 3 with srp package)
